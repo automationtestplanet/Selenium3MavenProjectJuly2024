@@ -48,7 +48,7 @@ public class WelcomePageTest {
 		
 		System.out.println(driver.findElement(By.name("Password")).isDisplayed());
 		
-		System.out.println(driver.findElement(By.className("checkbox")).isEnabled());		
+		System.out.println(driver.findElement(By.className("checkbox")).isSelected());		
 		
 		System.out.println(driver.findElement(By.partialLinkText("Raju Chelle")).getText());
 		
@@ -56,10 +56,10 @@ public class WelcomePageTest {
 		
 		System.out.println(driver.findElement(By.tagName("textarea")).getAttribute("value"));
 		
-		System.out.println(driver.findElement(By.tagName("textarea")).getCssValue("background-color"));	
-		
 		System.out.println(driver.findElement(By.tagName("textarea")).getLocation().getX());
 		System.out.println(driver.findElement(By.tagName("textarea")).getLocation().getY());
+		
+		System.out.println(driver.findElement(By.tagName("textarea")).getCssValue("background-color"));	
 		
 		
 		
