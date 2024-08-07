@@ -1,104 +1,65 @@
 package org.openmrs.demo;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.Select;
 
 public class OpenMrsSelenium3Test {
 
-	public static void main(String[] args) {
+	public static WebDriver driver;
 
+	public static void navigateToOpenMrsApplication(String url) {
 		System.setProperty("webdriver.chrome.driver",
 				System.getProperty("user.dir") + "//src//main//resources//DriverFiles//chrome//127//chromedriver.exe");
-		WebDriver driver = new ChromeDriver();
+		driver = new ChromeDriver();
 		driver.manage().window().maximize();
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		
-		driver.get("https://demo.openmrs.org/openmrs/login.htm");
-		driver.findElement(By.id("username")).sendKeys("Admin");
-		driver.findElement(By.id("password")).sendKeys("Admin123");
-		driver.findElement(By.id("Registration Desk")).click();
-		driver.findElement(By.cssSelector("input[value='Log In']")).click();
+		driver.get(url);
+	}
 
-		if (driver.getTitle().trim().equalsIgnoreCase("Home")
-				&& driver.findElement(By.partialLinkText("Logout")).isDisplayed()) {
+	public static void main(String[] args) {
+
+		navigateToOpenMrsApplication("https://demo.openmrs.org/openmrs/login.htm");
+
+		LoginPage loginPage = new LoginPage(driver);
+		HomePage homePage = new HomePage(driver);
+		RegistrationPage registrationPage = new RegistrationPage(driver);
+		RegisteredDetailsPage registeredDetilsPage = new RegisteredDetailsPage(driver);
+
+		loginPage.loginToOpeneMrs("Admin", "Admin123", "Registration Desk");
+		if (homePage.verfyLogin("Home")) {
 			System.out.println("Login Success");
-
 			System.out.println("--------------------------------Register Patient--------------------------");
+			if (homePage.verifyTile("Register a patient")) {
+				homePage.clickTile("Register a patient");
+				if (registrationPage.verifyRegisterPatientPage("Register a patient")) {
+					registrationPage.setPatientName("Ganesh, M");
+					registrationPage.clickNextButton();
 
-			if (driver.findElement(By.partialLinkText("Register a patient")).isDisplayed()) {
-				driver.findElement(By.partialLinkText("Register a patient")).click();
+					registrationPage.selectGenderByVisibleText("Male");
+					registrationPage.clickNextButton();
 
-				if (driver.findElement(By.xpath("//h2[normalize-space(text())='Register a patient']")).isDisplayed()) {
-					driver.findElement(By.name("givenName")).sendKeys("Ganesh");
-					driver.findElement(By.name("familyName")).sendKeys("M");
-					driver.findElement(By.id("next-button")).click();
+					registrationPage.setDateOfBirth("1,January,1990");
+					registrationPage.clickNextButton();
 
-					Select genderDropdown = new Select(driver.findElement(By.id("gender-field")));
+					registrationPage.setAddress("Do.No - 8/168, S R Nagar", "Hyderabad", "Telangana", "India",
+							"500038");
+					registrationPage.clickNextButton();
 
-					genderDropdown.selectByVisibleText("Male");
-					genderDropdown.selectByValue("M");
-					genderDropdown.selectByIndex(0);
+					registrationPage.setPhoneNumber("9876543210");
+					registrationPage.clickNextButton();
+					registrationPage.clickNextButton();
 
-					List<WebElement> allOptions = genderDropdown.getOptions();
-
-					for (WebElement eachOption : allOptions)
-						System.out.println(eachOption.getText());
-
-					System.out.println(genderDropdown.getFirstSelectedOption().getText());
-					driver.findElement(By.id("next-button")).click();
-
-					driver.findElement(By.id("birthdateDay-field")).sendKeys("1");
-
-					Select monthDropdown = new Select(driver.findElement(By.id("birthdateMonth-field")));
-					monthDropdown.selectByVisibleText("January");
-					driver.findElement(By.id("birthdateYear-field")).sendKeys("1990");
-					driver.findElement(By.id("next-button")).click();
-
-					driver.findElement(By.id("address1")).sendKeys("Do.No - 8/168, S R Nagar");
-					driver.findElement(By.id("cityVillage")).sendKeys("Hyderabad");
-					driver.findElement(By.id("stateProvince")).sendKeys("Telangana");
-					driver.findElement(By.id("country")).sendKeys("India");
-					driver.findElement(By.id("postalCode")).sendKeys("500038");
-					driver.findElement(By.id("next-button")).click();
-
-					driver.findElement(By.name("phoneNumber")).sendKeys("9876543210");
-					driver.findElement(By.id("next-button")).click();
-					driver.findElement(By.id("next-button")).click();
-
-					String actualName = driver.findElement(By.xpath("//span[text()='Name: ']//parent::p")).getText()
-							.trim();
-					String actualGender = driver.findElement(By.xpath("//span[text()='Gender: ']//parent::p")).getText()
-							.trim();
-					String actualBirthDate = driver.findElement(By.xpath("//span[text()='Birthdate: ']//parent::p"))
-							.getText().trim();
-					String actualAddress = driver.findElement(By.xpath("//span[text()='Address: ']//parent::p"))
-							.getText().trim();
-					String actualPhoneNumber = driver
-							.findElement(By.xpath("//span[text()='Phone Number: ']//parent::p")).getText().trim();
-
-					if (actualName.contains("Ganesh") && actualGender.contains("Male")
-							&& actualBirthDate.contains("1990") && actualAddress.contains("Hyderabad")
-							&& actualPhoneNumber.contains("9876543210")) {
-							
-						driver.findElement(By.cssSelector("input[value='Confirm']")).click();						
-						
-						if(driver.findElement(By.xpath("//em[text()='Given']//preceding-sibling::span[normalize-space(text())='Ganesh']")).isDisplayed()) {
-							String patientId = driver.findElement(By.xpath("//em[text()='Patient ID']//following-sibling::span")).getText().trim();
+					if (registrationPage.verfyConfirmPage("Ganesh", "Male", "1990", "Hyderabad", "9876543210")) {
+						registrationPage.clickConfirm();
+						if (registeredDetilsPage.verifyRegisteredPatientDetails("Ganesh")) {
+							String patientId = registeredDetilsPage.getPatientId();
 							System.out.println(patientId);
 						}
-						
-						
-					}else {
+					} else {
 						System.out.println("Register details are not displaying properly, Cancelling the register");
-						driver.findElement(By.cssSelector("input[value='Cancel']")).click();
+						registrationPage.clickCancel();
 					}
-
 				} else {
 					System.out.println("Register patient Page is not displayed");
 				}
