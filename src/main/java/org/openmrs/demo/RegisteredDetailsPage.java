@@ -3,12 +3,10 @@ package org.openmrs.demo;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class RegisteredDetailsPage {
-
-	WebDriver driver;
+public class RegisteredDetailsPage extends BasePage {
 	
 	public RegisteredDetailsPage(WebDriver driver) {
-		this.driver = driver;
+		super(driver);
 	}
 	
 	public boolean verifyRegisteredPatientDetails(String name) {

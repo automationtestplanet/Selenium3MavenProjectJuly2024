@@ -19,6 +19,8 @@ public class OpenMrsSelenium3Test {
 
 	public static void main(String[] args) {
 
+		Commons.setPropertyInTestProperties("patient.id", "12345");
+		
 		navigateToOpenMrsApplication("https://demo.openmrs.org/openmrs/login.htm");
 
 		LoginPage loginPage = new LoginPage(driver);
@@ -26,7 +28,7 @@ public class OpenMrsSelenium3Test {
 		RegistrationPage registrationPage = new RegistrationPage(driver);
 		RegisteredDetailsPage registeredDetilsPage = new RegisteredDetailsPage(driver);
 
-		loginPage.loginToOpeneMrs("Admin", "Admin123", "Registration Desk");
+		loginPage.loginToOpenMrs("Admin", "Admin123", "Registration Desk");
 		if (homePage.verfyLogin("Home")) {
 			System.out.println("Login Success");
 			System.out.println("--------------------------------Register Patient--------------------------");
@@ -55,6 +57,7 @@ public class OpenMrsSelenium3Test {
 						if (registeredDetilsPage.verifyRegisteredPatientDetails("Ganesh")) {
 							String patientId = registeredDetilsPage.getPatientId();
 							System.out.println(patientId);
+							Commons.setPropertyInTestProperties("patient.id", patientId);
 						}
 					} else {
 						System.out.println("Register details are not displaying properly, Cancelling the register");

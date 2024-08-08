@@ -4,12 +4,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
 
-public class RegistrationPage {
-
-	WebDriver driver;
+public class RegistrationPage extends BasePage{
 
 	public RegistrationPage(WebDriver driver) {
-		this.driver = driver;
+		super(driver);
 	}
 	
 	public boolean verifyRegisterPatientPage(String pageName) {
