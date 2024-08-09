@@ -20,13 +20,14 @@ public class OpenMrsSelenium3Test {
 	public static void main(String[] args) {
 
 		Commons.setPropertyInTestProperties("patient.id", "12345");
-		
+
 		navigateToOpenMrsApplication("https://demo.openmrs.org/openmrs/login.htm");
 
 		LoginPage loginPage = new LoginPage(driver);
 		HomePage homePage = new HomePage(driver);
 		RegistrationPage registrationPage = new RegistrationPage(driver);
 		RegisteredDetailsPage registeredDetilsPage = new RegisteredDetailsPage(driver);
+		FindPatientPage findPatientPage = new FindPatientPage(driver);
 
 		loginPage.loginToOpenMrs("Admin", "Admin123", "Registration Desk");
 		if (homePage.verfyLogin("Home")) {
@@ -58,6 +59,32 @@ public class OpenMrsSelenium3Test {
 							String patientId = registeredDetilsPage.getPatientId();
 							System.out.println(patientId);
 							Commons.setPropertyInTestProperties("patient.id", patientId);
+
+							System.out
+									.println("--------------------------------Find Patient--------------------------");
+							homePage.clickHomeButton();
+							if (homePage.verifyTile("Find Patient Record")) {
+								homePage.clickTile("Find Patient Record");
+								if (findPatientPage.verifyFindPatientPage("Find Patient Record")) {
+									findPatientPage.setPatientIdInSearchFiled(patientId);
+									if (findPatientPage.getFindPatientTableColumnValue("Identifier")
+											.contains(patientId)) {
+										findPatientPage.clickSearchedRecord();
+										String actualPatientId = registeredDetilsPage.getPatientId();
+										if (actualPatientId.equals(patientId)) {
+											System.out.println("Patient Details are displayig properly");
+										} else {
+											System.out.println("Patient Details are incorrect");
+										}
+									} else {
+										System.out.println("Searched record is displaying wrong");
+									}
+								} else {
+									System.out.println("Find Patient page is not displayed");
+								}
+							} else {
+								System.out.println("Find Paatient Record TIle is not available");
+							}
 						}
 					} else {
 						System.out.println("Register details are not displaying properly, Cancelling the register");

@@ -2,12 +2,17 @@ package org.openmrs.demo;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 public class HomePage extends BasePage{
 	
 	public HomePage(WebDriver driver) {
 		super(driver);
 	}
+	
+	@FindBy(css = "i[class='icon-home small']")
+	WebElement homeButton;
 	
 	public boolean verfyLogin(String pageName) {
 		return driver.getTitle().trim().equalsIgnoreCase("Home")
@@ -20,5 +25,13 @@ public class HomePage extends BasePage{
 
 	public void clickTile(String tileName) {
 		driver.findElement(By.partialLinkText(tileName)).click();
+	}
+	
+	public WebElement getHomeButton() {
+		return homeButton;
+	}
+	
+	public void clickHomeButton() {
+		getHomeButton().click();
 	}
 }
