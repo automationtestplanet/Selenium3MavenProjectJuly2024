@@ -26,7 +26,7 @@ public class OpenMrsSelenium3Test {
 		LoginPage loginPage = new LoginPage(driver);
 		HomePage homePage = new HomePage(driver);
 		RegistrationPage registrationPage = new RegistrationPage(driver);
-		RegisteredDetailsPage registeredDetilsPage = new RegisteredDetailsPage(driver);
+		PatientDetailsPage patientDeailsPage = new PatientDetailsPage(driver);
 		FindPatientPage findPatientPage = new FindPatientPage(driver);
 
 		loginPage.loginToOpenMrs("Admin", "Admin123", "Registration Desk");
@@ -55,11 +55,10 @@ public class OpenMrsSelenium3Test {
 
 					if (registrationPage.verfyConfirmPage("Ganesh", "Male", "1990", "Hyderabad", "9876543210")) {
 						registrationPage.clickConfirm();
-						if (registeredDetilsPage.verifyRegisteredPatientDetails("Ganesh")) {
-							String patientId = registeredDetilsPage.getPatientId();
+						if (patientDeailsPage.verifyRegisteredPatientDetails("Ganesh")) {
+							String patientId = patientDeailsPage.getPatientId();
 							System.out.println(patientId);
 							Commons.setPropertyInTestProperties("patient.id", patientId);
-
 							System.out
 									.println("--------------------------------Find Patient--------------------------");
 							homePage.clickHomeButton();
@@ -67,12 +66,59 @@ public class OpenMrsSelenium3Test {
 								homePage.clickTile("Find Patient Record");
 								if (findPatientPage.verifyFindPatientPage("Find Patient Record")) {
 									findPatientPage.setPatientIdInSearchFiled(patientId);
-									if (findPatientPage.getFindPatientTableColumnValue("Identifier")
-											.contains(patientId)) {
+									String searchedPatientID = findPatientPage
+											.getFindPatientTableColumnValue("Identifier");
+									if (searchedPatientID.contains(patientId)) {
 										findPatientPage.clickSearchedRecord();
-										String actualPatientId = registeredDetilsPage.getPatientId();
+										String actualPatientId = patientDeailsPage.getPatientId();
 										if (actualPatientId.equals(patientId)) {
 											System.out.println("Patient Details are displayig properly");
+
+											System.out.println(
+													"--------------------------------Active Visits and Add Attachments --------------------------");
+											patientDeailsPage.clickActiveVisits();
+											patientDeailsPage.clickActiveVisitsConfirmButton();
+
+											if (patientDeailsPage.verifyEndVisitsLink()) {
+												System.out.println("Start Visits activated");
+												patientDeailsPage.clickAttachmentsLink();
+
+												if (patientDeailsPage.verifyClickDropButton()) {
+													System.out.println("Click Drop button is displayed");
+													patientDeailsPage.clickDropButton();
+													patientDeailsPage.uploadFileFromWindowPopup("UploadFile.pdf");
+													patientDeailsPage.setCaption("File1");
+													patientDeailsPage.clickUploadButton();
+
+													if (patientDeailsPage.verifyUploadedFile("File1")) {
+														System.out.println("File Upload Successfull");
+														System.out.println(
+																"--------------------------------Delete Patient --------------------------");
+														homePage.clickHomeButton();
+														homePage.clickTile("Find Patient Record");
+														findPatientPage.setPatientIdInSearchFiled(patientId);
+														findPatientPage.clickSearchedRecord();
+														patientDeailsPage.clickDeletePatientLink();
+														patientDeailsPage.setDeleteReason("Other");
+														patientDeailsPage.clickDeletePatientCofirmButton();
+														findPatientPage.setPatientIdInSearchFiled(patientId);
+														if (patientDeailsPage.verifyErrorMessage()) {
+															System.out.println("Patient Record deleted successfully");
+														} else {
+															System.out.println("Patient Record is not deleted");
+														}
+													} else {
+														System.out.println("File Upload Failed");
+													}
+
+												} else {
+													System.out.println("Click Drop button is not displayed");
+												}
+
+											} else {
+												System.out.println("Start Visits not activated");
+											}
+
 										} else {
 											System.out.println("Patient Details are incorrect");
 										}
@@ -83,7 +129,7 @@ public class OpenMrsSelenium3Test {
 									System.out.println("Find Patient page is not displayed");
 								}
 							} else {
-								System.out.println("Find Paatient Record TIle is not available");
+								System.out.println("Find Paatient Record Tile is not available");
 							}
 						}
 					} else {
