@@ -14,6 +14,9 @@ public class HomePage extends BasePage{
 	@FindBy(css = "i[class='icon-home small']")
 	WebElement homeButton;
 	
+	@FindBy(partialLinkText = "Logout")
+	WebElement logoutButton;
+	
 	public boolean verfyLogin(String pageName) {
 		return driver.getTitle().trim().equalsIgnoreCase("Home")
 				&& driver.findElement(By.partialLinkText("Logout")).isDisplayed();
@@ -33,5 +36,9 @@ public class HomePage extends BasePage{
 	
 	public void clickHomeButton() {
 		getHomeButton().click();
+	}
+	
+	public void clickLogout() {
+		logoutButton.click();
 	}
 }

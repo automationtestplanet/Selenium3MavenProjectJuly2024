@@ -1,12 +1,14 @@
 package org.openmrs.demo;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-
-public class LoginPage extends BasePage{
+public class LoginPage extends BasePage {
 
 	public LoginPage(WebDriver driver) {
 		super(driver);
@@ -42,11 +44,30 @@ public class LoginPage extends BasePage{
 	}
 
 	public void clickModule(String moduleName) {
-		driver.findElement(By.id(moduleName)).click();
+
+		try {
+			WebElement moduleElement = driver.findElement(By.id(moduleName));
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			js.executeScript("arguments[0].scrollIntoView(true)", moduleElement);
+			Actions actions = new Actions(driver);
+//			moduleElement.click();
+			actions.moveToElement(moduleElement).click(moduleElement).build().perform();
+		} catch (Exception e) {
+			System.out.println("Exception Occured while clicking ModuleName: " + e.getMessage());
+		}
 	}
 
 	public void clickLoginButton() {
-		getLoginButtonElement().click();
+		try {
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			js.executeScript("arguments[0].scrollIntoView(true)", getLoginButtonElement());
+//			getLoginButtonElement().click();
+			Actions actions = new Actions(driver);
+//			moduleElement.click();
+			actions.moveToElement(getLoginButtonElement()).click(getLoginButtonElement()).build().perform();
+		} catch (Exception e) {
+			System.out.println("Exception Occured While clicking login: " + e.getMessage());
+		}
 	}
 
 	public void loginToOpenMrs(String userName, String password, String moduleName) {
